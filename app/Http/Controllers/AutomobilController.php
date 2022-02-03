@@ -6,6 +6,8 @@ use App\Http\Resources\AutomobilCollection;
 use App\Http\Resources\AutomobilResource;
 use App\Models\Automobil;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 
 class AutomobilController extends Controller
 {
@@ -38,7 +40,25 @@ class AutomobilController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validator = Validator::make($request->all(), [ 
+            'name' => 'required|string|max:255',
+            'description' => 'required|string|min:5',
+            'price' => 'required',
+            'automobilType_id' => 'required'
+        ]);
+
+        if ($validator->fails())
+            return response()->json($validator->errors());
+
+        $automobil = Automobil::create([
+            'name' => $request->name,
+            'description' => $request->description,
+            'price' => $request->price,
+            'automobilType_id' => $request->automobilType_id,
+            'user_id' => Auth::user()->id,
+        ]);
+
+        return response()->json(['Automobil je uspesno dodat.', new AutomobilResource($automobil)]);
     }
 
     /**
@@ -72,7 +92,25 @@ class AutomobilController extends Controller
      */
     public function update(Request $request, Automobil $automobil)
     {
-        //
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|max:255',
+            'description' => 'required|string|min:5',
+            'price' => 'required',
+            'automobilType_id' => 'required'
+        ]);
+
+        if ($validator->fails())
+            return response()->json($validator->errors());
+
+        $automobil->name = $request->name;
+        $automobil->description = $request->description;
+        $automobil->price = $request->price;
+        $automobil->automobilType_id = $request->automobilType_id;
+        $automobil->user_id = Auth::user()->id;
+
+        $automobil->save();
+
+        return response()->json(['Automobil je uspesno izmenjen.', new AutomobilResource($automobil)]);
     }
 
     /**
@@ -83,6 +121,7 @@ class AutomobilController extends Controller
      */
     public function destroy(Automobil $automobil)
     {
-        //
+        $automobil->delete();
+        return response()->json(['Automobil je uspesno obrisan.']);
     }
 }

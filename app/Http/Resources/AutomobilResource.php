@@ -22,7 +22,7 @@ class AutomobilResource extends JsonResource
             'description'=>$this->resource->description,
             'price'=>$this->resource->price,
             'user'=>new UserResource($this->resource->user),
-            'automobil type'=>$this->resource->automobilType_id
+            'automobilType'=>$this->resource->automobilType_id
         ];
     }
 }
